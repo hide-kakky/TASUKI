@@ -1,0 +1,206 @@
+version: v1.0r1
+metadata:
+  base_requirements: docs/BATON_requirements_v8.5.md
+  timeframe_days: 20
+  phases: 3
+  team_context: "Founder/PM + solo dev (scales to multi-dev)."
+layers:
+  - name: infra_saas
+    description: "Initial setup for Supabase, Mux, Gemini, Sentry, Slack alerts."
+  - name: data_security
+    description: "Postgres schema, RLS, RBAC."
+  - name: backend_flow
+    description: "Supabase Edge Functions (webhook / AI processing / cron)."
+  - name: frontend
+    description: "Flutter app (Auth / Flow UI / Stock UI / Offline)."
+phases:
+  - name: Phase1
+    days: Day1-3
+    goal: "Build the infra + DB backbone."
+    definition_of_done:
+      - "Define Supabase schema + RLS (owner-only read)."
+      - "Verify Mux / Gemini APIs through the Edge runtime."
+      - "Establish `.env` / secrets pipeline."
+  - name: Phase2
+    days: Day4-10
+    goal: "Make Flow→Mux→Stock draft run end-to-end."
+    definition_of_done:
+      - "Device→Mux→Gemini→manuals.draft succeeds."
+      - "Offline recording + auto resend works."
+      - "Webhook idempotency tests pass."
+  - name: Phase3
+    days: Day11-20
+    goal: "Ship Manager approvals and repay debt (L0→L1)."
+    definition_of_done:
+      - "Manager UI can approve→publish."
+      - "manual_edits telemetry works."
+      - "VideoService/AiService/Repository abstractions in place."
+repositories_env:
+  structure: "Prefer monorepo (`baton/` with `apps/app` and `apps/edge`)."
+  env_management: "direnv + `.envrc`; secrets via 1Password or `supabase secrets`."
+  tooling: "Use melos or justfile for shared commands."
+supabase_setup:
+  steps:
+    - "Create project then run `supabase init`."
+    - "Define core tables (organizations, stores, users, memberships, handovers, manuals, ai_jobs, audit_logs, manual_edits) in `schema.sql`."
+    - "Create `profiles` view to join `auth.users` with app `users`."
+    - "Attach `jsonb meta` to uncertain fields."
+rbac_rls:
+  role_mapping:
+    - role: root
+      storage: "Server-side flag (dedicated table or raw_app_meta_data)."
+    - role: admin
+      storage: "Server-managed flag."
+    - role: owner/manager/staff
+      storage: memberships.role
+  initial_policy: "Owner-only read; match `auth.uid()` with memberships.role."
+  store_scope: "Limit handovers/manuals by store_id."
+  root_bypass: "Service-role key bypasses RLS."
+mux_setup:
+  upload_mode: simple_direct_upload_public
+  steps:
+    - "Issue API token."
+    - "Set webhook URL to `https://<project>.functions.supabase.co/mux_webhook`."
+    - "Enable asset.created / ready / errored events."
+  notes: "Plan to move to signed URLs later."
+gemini_setup:
+  gcp_project: create_new
+  model_version: "Gemini 1.5 or 3 (latest)."
+  secret_injection: "`supabase secrets set GEMINI_API_KEY=...`"
+  locale_handling: "Edge relies on `users.language` to choose output locale."
+phase1_checklist:
+  - "Document repo layout & `.env` policy."
+  - "Supabase schema / RLS (owner-only)."
+  - "Mux upload + webhook smoke test."
+  - "Gemini hello-world request."
+  - "Configure Sentry DSN for Flutter / Edge."
+flutter_setup:
+  dependencies:
+    - supabase_flutter
+    - riverpod_or_hooks_riverpod
+    - camera
+    - image_picker
+    - permission_handler
+    - isar
+    - connectivity_plus
+  navigation_flow: "SplashScreen → AuthScreen (Magic Link) → HomeTimelineScreen."
+  auth: "Supabase Auth email link; subscribe to `supabase.auth.onAuthStateChange`."
+flow_uploader:
+  ui:
+    - "Long-press record button."
+    - "Recording timer."
+    - "Upload status badge."
+  local_queue:
+    storage: isar
+    fields: [id, file_path, store_id, user_id, created_at, retry_count, checksum]
+  worker:
+    trigger: "On app launch + every 5 minutes."
+    steps:
+      - "Check connectivity."
+      - "Upload FIFO jobs to Mux."
+      - "Insert into handovers with `ai_status='pending_upload'` on success."
+  optimistic_ui:
+    - "Show placeholder card right after handovers INSERT."
+    - "Sync via Supabase Realtime."
+  failure_policy:
+    max_retries: 3
+    action: "Notify user + expose retry button."
+edge_functions:
+  mux_webhook:
+    input: "asset_id, playback_ids, status"
+    actions:
+      - "Find handover by asset_id."
+      - "Update hls_url, thumbnail_url, ai_status."
+      - "Trigger `ai_process_handover` async."
+  ai_process_handover:
+    input: handover_id
+    steps:
+      - "Fetch hls_url / language from handovers."
+      - "Send system + user prompts to Gemini."
+      - "Save draft into manuals."
+      - "Update ai_status and ai_jobs."
+    retry_policy: "Up to 3 attempts; log failure as `ai_status='failed'`."
+phase2_tests:
+  - "Record Flow → see placeholder → draft arrives within 90s."
+  - "Offline→online transition auto-sends pending_uploads."
+  - "Duplicate webhook events remain idempotent."
+manager_ui:
+  screens:
+    - "ManualListScreen (draft/published filter, sort, search)."
+    - "ManualDetailScreen (AI content, video thumbnail, approve/reject)."
+  role_check: "Require memberships.role >= manager (UI + RLS)."
+  publish_flow:
+    - "Set manuals.status='published' on approval."
+    - "Populate approved_by / published_at."
+manual_edits_tracking:
+  storage: manual_edits
+  fields: [manual_id, editor_id, edit_start_at, edit_end_at, diff_summary, diff_type]
+  client_flow:
+    - "Send `start` when edit mode opens."
+    - "Send `end` on save with diff category (typo/translation/missing_step/safety_issue/etc.)."
+technical_debt_paydown:
+  actions:
+    - "VideoService: centralize upload/getPlaybackUrl and isolate Mux SDK calls."
+    - "AiService: centralize Gemini calls plus locale/prompt management."
+    - "Repository layer: shared Supabase queries via HandoverRepository / ManualRepository."
+    - "Error handling: throw normalized exceptions in services; UI shows SnackBar + retry."
+commitments_phase3:
+  demo: "Flow→Draft→Approval→Publish→Metrics demo within 1 hour."
+  cost_monitoring: "Edge Cron runs daily, posts Mux/Gemini cost ratios to Slack."
+cost_monitoring:
+  formulas:
+    mux_cost_ratio: "(mux_unit_cost * monthly_flow_count) / ARPU"
+    gemini_cost_ratio: "(gemini_unit_cost * monthly_flow_count) / ARPU"
+  workflow:
+    - "Query flow_count via Supabase SQL or Functions."
+    - "Store estimates in warnings table."
+    - "Push summary to Slack Incoming Webhook."
+metrics_examples:
+  supabase_sql: |
+    select store_id,
+           count(*) filter (where flow_to_stock_success) as flow_stock_count,
+           count(*) filter (where manager_approved) as approved_count
+    from daily_metrics
+    where date between current_date - interval '7 day' and current_date;
+  dashboards:
+    - "Flow submissions"
+    - "Flow→Stock conversions"
+    - "Manager approvals"
+  observability:
+    flutter: "SentryFlutter + Logger"
+    edge: "console.log JSON + log_metrics table"
+checklist_summary:
+  - step: 0
+    description: "Prep Git repo, Supabase project, Mux/Gemini/Sentry accounts."
+  - step: 1
+    description: "DB & RBAC (tables, roles, strict RLS)."
+  - step: 2
+    description: "Flutter base (Auth→Home, timeline mock, recording UI)."
+  - step: 3
+    description: "Mux integration (upload, handovers insert, optimistic UI)."
+  - step: 4
+    description: "Edge & Gemini (`mux_webhook`, `ai_process_handover`, save drafts)."
+  - step: 5
+    description: "Manager flow (list/detail/approval, role checks)."
+  - step: 6
+    description: "Debt paydown (VideoService / AiService / repositories)."
+  - step: 7
+    description: "Cost + metrics (Cron + Slack, dashboards)."
+open_topics:
+  - name: Prompt optimization
+    detail: "Pass video link + store context + desired format to Gemini."
+    due: "Before Phase2 ends."
+  - name: Multilingual support
+    detail: "Align users.language with manuals output locale."
+    due: "Phase3."
+  - name: Cross-store role conflicts
+    detail: "Handle owner/manager visibility when users belong to multiple stores."
+    due: "Late Phase2."
+  - name: SSO/2FA roadmap
+    detail: "Plan expansion after PMF (Phase4+)."
+    due: "Post-PMF."
+references:
+  - docs/BATON_requirements_v8.5.md
+  - CODEX_PROMPT.md
+  - plan.md
+  - agent.md

@@ -1,0 +1,303 @@
+version: v8.5r1
+metadata:
+  date: "2025-11-24"
+  author: "柿澤（Founder / PM）"
+  status: "Formal Specification (Engineering-Ready)"
+  change_log:
+    - version: v8.5r1
+      note: "Improved readability and clarified open points."
+executive_summary:
+  - "BATON is an AI-native operations OS that turns on-site tacit knowledge into Flow (input) → Stock (structured knowledge) assets."
+  - "Mission: build restaurants where new hires never quit by letting them feel education cost relief within 7 days."
+  - "MVP scope stays laser-focused on the Flow→Stock pipeline; Evaluation remains locked until PMF (Phase 4)."
+  - "Primary KPI = M3 Retention, with leading indicators Flow volume, Flow→Stock success rate, and Manager approvals."
+  - "Golden Stack: Flutter/Riverpod/isar frontend, Supabase backend, Mux video, Gemini 3 AI."
+  - "Cost guardrails: when Mux hits 15% ARPU or Gemini hits 20% ARPU, consider graduating to in-house GCP stack."
+mission_vds:
+  mission: "Visualize tacit knowledge via Flow→Stock automation, reduce training load within 7 days, and prevent early attrition."
+  vision:
+    - "Keep every unsung contribution visible."
+    - "Enable miscommunication-free ops across multinational, multi-store environments."
+  design_principles:
+    - Zero-Friction Input
+    - Text-First UX
+    - Safety First (protect psychological safety until AI proves PMF)
+    - Layered Abstraction (build minimum viable layers but keep extensibility)
+  strategy:
+    - "Limit MVP scope to Flow→Stock."
+    - "Measure PMF with M3 Retention."
+    - "Intentionally take on debt and repay 40% during Phase 2."
+    - "Unlock AI Evaluation only in Phase 4."
+    - "Track Mux/Gemini costs as ARPU ratios with explicit thresholds."
+product_goals:
+  activation_values:
+    - "AI drafts a Stock entry within minutes after a Flow upload."
+    - "Managers experience “AI wrote the manual for me” within 7 days."
+    - "Monitor Flow frequency and Manager approvals as tangible proof of success."
+  kpis:
+    main:
+      name: M3 Retention
+      note: "Churn rate; assumes Activation success."
+    leading:
+      - name: Weekly Flow submissions
+        target: "Maintain upward trend."
+      - name: Flow→Stock success rate
+        target: ">=90%"
+      - name: Manager approval rate
+        target: ">=80%"
+    supporting:
+      - name: In-store DAU
+      - name: Time to first Stock conversion
+        target: "<=7 days"
+    cost_guards:
+      - name: Mux cost ratio
+        threshold: "<=15% of ARPU"
+        action: "Switch VideoService to GCP (GCS + Transcoder) when exceeded."
+      - name: Gemini cost ratio
+        threshold: "<=20% of ARPU"
+        action: "Consider Vertex or in-house AI when exceeded."
+scope_and_phases:
+  phases:
+    - name: Phase1
+      days: "Day1-3"
+      goal: "Stand up Supabase/DB/RBAC plus Mux & Gemini foundations."
+      owners: [Infra, Backend]
+    - name: Phase2
+      days: "Day4-10"
+      goal: "Establish an end-to-end Flow→Mux→Stock draft path."
+      owners: [Frontend, Edge]
+    - name: Phase3
+      days: "Day11-20"
+      goal: "Deliver Manager approval UI, AI quality logging, and L0→L1 refactors."
+      owners: [All]
+  priorities:
+    must:
+      - Long-press recording
+      - Offline save with auto retry
+      - Mux upload
+      - Webhook→Edge→Gemini processing
+      - AI summary / steps extraction
+      - Manager approval
+    should:
+      - Tag search
+      - Sorting
+      - Store-level settings
+    later:
+      - Evaluation (AI contribution extraction / monthly reports)
+      - Behavioral analytics
+      - Automatic LLM model selection
+personas:
+  - name: staff
+    goals: "Capture and share know-how with one press."
+    key_features: ["Flow capture UI", "Offline upload queue", "Timeline view"]
+  - name: manager
+    goals: "Review AI manuals, approve content, invite staff."
+    key_features: ["Stock list", "Detail/approval view", "Metrics view"]
+  - name: owner
+    goals: "Manage stores and plans, assign managers."
+    key_features: ["Organization management UI"]
+  - name: admin
+    goals: "Create/suspend orgs, audit data."
+    key_features: ["Supabase admin tools", "Internal dashboards"]
+  - name: root
+    goals: "Change schema, swap AI models, bypass RLS."
+    key_features: ["Server-side only access"]
+user_flows:
+  - name: flow_posting
+    steps:
+      - "Staff long-presses to record."
+      - "Show an optimistic timeline card immediately."
+      - "Upload to Mux online; store in pending_uploads offline."
+      - "Auto-resend when connectivity returns."
+  - name: ai_conversion
+    steps:
+      - "`mux_webhook` Edge Function receives the Mux event."
+      - "Edge updates `handovers` and triggers `ai_process_handover`."
+      - "Gemini generates summary/steps/tips and saves a draft in `manuals`."
+  - name: manager_approval
+    steps:
+      - "Manager reviews the draft detail."
+      - "Optional edits logged into `manual_edits`."
+      - "Approve to publish (`status='published'`)."
+architecture:
+  golden_stack:
+    frontend: "Flutter + Riverpod + isar"
+    backend: "Supabase (Auth, RLS, PostgreSQL, Edge, Storage)"
+    video: "Mux (Upload, HLS, Thumbnail)"
+    ai: "Gemini 3 (summaries / translation / structuring)"
+    monitoring: "Sentry"
+  abstraction_levels:
+    L0:
+      description: "MVP — call Supabase CRUD directly from UI; isolate Mux/Gemini in dedicated services."
+    L1:
+      description: "Operational launch — introduce repositories and 1 Edge Function per use case."
+    L2:
+      description: "Scale — abstract VideoService (Mux⇄GCP) and AI Service (Gemini⇄Vertex), enforce strict RLS + row ownership."
+  ai_pipeline:
+    steps:
+      - Capture on device
+      - "Mux auto-generates HLS + thumbnails"
+      - "Edge Function `mux_webhook` ingests events"
+      - "Update `handovers` to `ai_status='ready_for_ai'`"
+      - "`ai_process_handover` calls Gemini"
+      - "Store summary/steps/tips as draft in `manuals`"
+      - "Manager publishes (`status='published'`)"
+    performance_target: "30–90 seconds (Mux processing + Gemini inference)"
+data_model:
+  entities:
+    - table: organizations
+      description: Tenants
+      columns: [id, name, plan, billing_meta]
+    - table: stores
+      description: Stores
+      columns: [id, organization_id, name, timezone]
+    - table: users
+      description: App users
+      columns: [id, auth_user_id, display_name, language, meta]
+    - table: memberships
+      description: User roles
+      columns: [user_id, store_id, role, status, invited_by]
+    - table: handovers
+      description: Flow videos
+      columns: [id, store_id, author_id, mux_asset_id, hls_url, thumbnail_url, ai_status, local_offline_flag, captured_at, meta]
+    - table: manuals
+      description: Stock (AI or manual)
+      columns: [id, handover_id, ai_summary, ai_steps, ai_tips, status, approved_by, published_at, edit_metrics]
+    - table: ai_jobs
+      description: AI processing states
+      columns: [id, handover_id, stage, retries, error_code, payload]
+    - table: audit_logs
+      description: Root/admin audit logs
+      columns: [id, actor_id, action, target, payload, created_at]
+    - table: manual_edits
+      description: Manager edit tracking
+      columns: [manual_id, editor_id, edit_start_at, edit_end_at, diff_summary]
+  statuses:
+    handovers_ai_status:
+      - pending_upload
+      - uploaded
+      - ready_for_ai
+      - ai_running
+      - draft_created
+      - failed
+    manuals_status:
+      - draft
+      - approved
+      - published
+rbac:
+  root:
+    permissions:
+      - "Access all orgs/stores"
+      - "Bypass RLS"
+      - "Modify schemas"
+      - "Switch AI models"
+      - "Freeze fraudulent orgs"
+    note: "Developers only."
+  admin:
+    permissions:
+      - Create/suspend orgs
+      - Reissue owners
+      - Restore stores
+      - View audit logs
+  owner:
+    permissions:
+      - Create/delete stores
+      - Assign managers
+      - Change plans
+      - View all Flow/Stock
+  manager:
+    permissions:
+      - Approve Stock
+      - Invite staff
+      - Manage manuals
+  staff:
+    permissions:
+      - Post Flow
+      - View Stock
+  rls_policy:
+    default: "Start with owner-only access, then relax to manager/staff as policies mature."
+    scope_rules:
+      - "Restrict handovers/manuals to members of the same store."
+      - "Root connections use the service role key to bypass."
+functional_requirements:
+  flow:
+    - "Long-press capture for up to ~120 seconds."
+    - "Offline save via isar with automatic resend."
+    - "Optimistic UI with placeholder card + ai_status badge."
+    - "Retry button when uploads fail."
+  stock:
+    - "Filter/search drafts vs published."
+    - "Show 3-line summary, steps, tips."
+    - "Single flow for edit→approve→publish."
+    - "Log approval edits into manual_edits with duration."
+  admin_owner:
+    - "Owners: create stores, assign managers, update plans."
+    - "Admins/root: manage audit logs and AI model switches via CLI/tooling."
+  ai_requirements:
+    - "Use Gemini 3 for summaries/steps/tips with multilingual support."
+    - "Track ai_jobs with up to 3 automatic retries."
+    - "Store manual_edits for future evaluation models."
+non_functional_requirements:
+  performance:
+    - timeline_render: "<=1s"
+    - app_launch: "<=2s"
+    - ai_processing: "30-90s"
+  availability:
+    - supabase: "99.9%"
+    - mux: "99.99%"
+    - offline_support: "Full offline posting + retry"
+  security:
+    - JWT
+    - RLS
+    - "Strict tenant isolation"
+    - "Root/Admin audit logs"
+    - "Store API keys in Edge Functions"
+  cost:
+    - mux: "<=15% ARPU"
+    - gemini: "<=20% ARPU"
+  reliability:
+    - "Design webhook/Edge processing to be idempotent using asset_id + handover_id locks."
+observability_metrics:
+  logging:
+    - "Edge Functions emit structured logs for webhook events and AI failures."
+  dashboards:
+    - "Flow submissions"
+    - "Flow→Stock conversions"
+    - "Manager approvals"
+  monitoring:
+    - "Supabase Edge or Cron estimates costs and notifies Slack."
+    - "Track days-to-first-Stock as QA metric."
+roadmap:
+  - window: Day1-3
+    focus: "Auth, RLS, Mux wiring, DB schema."
+  - window: Day4-7
+    focus: "Flow UI, offline queue, Mux upload, optimistic timeline."
+  - window: Day8-10
+    focus: "Webhook / Edge / Gemini integration, save drafts to `manuals`."
+  - window: Day11-14
+    focus: "Manager approval UX, role checks, manual_edits logging."
+  - window: Day15-20
+    focus: "L0→L1 abstractions, UI polish, QA, cost monitoring script."
+migration_strategy:
+  triggers:
+    - "ARR >= 100M JPY"
+    - "Mux cost > 15% revenue"
+    - "AI cost > 20% revenue"
+    - "Stores > 100"
+  plan:
+    - db: "pg_dump → Cloud SQL (handled via repository layer)"
+    - video: "Mux → GCS + Transcoder (VideoService switch)"
+    - ai: "Gemini → Vertex (AiService model swap)"
+    - backend: "Supabase Edge → Cloud Run (REST endpoints)"
+risks_and_open_items:
+  - risk: "RLS complexity"
+    mitigation: "Start with owner-only access and relax gradually."
+  - risk: "Offline video size causing resend failures"
+    mitigation: "Cap recordings at ~120s; consider quality controls later."
+  - risk: "AI quality variance"
+    mitigation: "Use manual_edits data to tune prompts."
+  - risk: "Cost overruns"
+    mitigation: "Weekly reports plus Slack alerts when near thresholds."
+  - risk: "Multilingual context loss"
+    mitigation: "Add contextual tips and run multilingual QA."
+conclusion: "BATON v8.5r1 keeps the focus on Flow→Stock, prioritizes OODA + Retention, and leverages abstraction layers to enable low-friction scaling or graduation to GCP."
