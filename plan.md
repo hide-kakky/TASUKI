@@ -15,7 +15,12 @@
 ---
 
 ## 1. ミッション整合
-- **参照要件**：`docs/BATON_requirements_v8.5.md`
+- **参照要件**：`docs/BATON_requirements_v8.6.md`
+- **デザイン図面**：`docs/BATON_design_diagrams.md` (Flows, Sequences, ERD)
+- **DBスキーマ**：`docs/BATON_database_schema.md` (Tables, RLS)
+- **API定義**：`docs/BATON_api_definition.md` (Edge Functions, Webhooks)
+- **インフラ**：`docs/BATON_infra_setup.md` (Supabase, Mux, Gemini)
+- **テスト計画**：`docs/BATON_testing_plan.md` (QA Strategy)
 - **ユーザー価値**：Flow→Stock を 7 日以内に体験させ、教育コスト削減を実感させる。
 
 ---
@@ -36,8 +41,8 @@
 ## 3. マイルストーンボード
 | # | マイルストーン | ステータス | Exit 条件 / 実績 | 目標日 | オーナー | 次アクション |
 |---|----------------|-----------|------------------|--------|----------|--------------|
-| 1 | Flow→Mux→Stock Draft | □ | Edge / Gemini 連携で draft 保存 | YYYY-MM-DD | Codex | `<ACTION: ...>` |
-| 2 | Manager 承認体験 | □ | Draft 承認→公開→編集ログ | YYYY-MM-DD | Codex |  |
+| 1 | Flow→Mux→Stock Draft | □ | Edge / Gemini 連携で draft 保存 + Google Docs 取り込み | YYYY-MM-DD | Codex | `<ACTION: ...>` |
+| 2 | Manager 承認 & 一般閲覧 | □ | Draft 承認→公開、一般閲覧 UI | YYYY-MM-DD | Codex |  |
 | 3 | L0→L1 抽象化 & コスト監視 | □ | Video/Ai Service 抽出 + Cron | YYYY-MM-DD | Codex |  |
 
 **運用**：更新時にステータスを ✅/▶/□ へ変更し、Exit 条件には実績と検証結果を追記する。`次アクション` には完了までの手順を記載。
@@ -56,10 +61,12 @@
 - **バックエンド**
   - □ `mux_webhook` 実装
   - □ `ai_process_handover` 実装
+  - □ `import_google_doc` 実装
 - **フロントエンド**
   - □ Flow 録画 UI
   - □ Offline Queue
-  - □ Manager 承認 UI
+  - □ Manager 承認 UI & Google Docs 追加モーダル
+  - □ 一般ユーザー閲覧 UI（タイムライン/一覧/詳細）
 
 ### 4.2 進行ログ
 | 日付 | タスク | ステータス | 検証 / 備考 |
