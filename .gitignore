@@ -1,0 +1,63 @@
+# Environment variables
+.env
+.env.local
+.env.staging
+.env.production
+.envrc
+
+# Supabase
+.supabase/
+
+# Flutter
+apps/app/.dart_tool/
+apps/app/.flutter-plugins
+apps/app/.flutter-plugins-dependencies
+apps/app/.packages
+apps/app/build/
+apps/app/ios/Flutter/Generated.xcconfig
+apps/app/ios/Flutter/flutter_export_environment.sh
+apps/app/ios/Pods/
+apps/app/ios/.symlinks/
+apps/app/android/.gradle
+apps/app/android/app/debug
+apps/app/android/app/profile
+apps/app/android/app/release
+apps/app/*.iml
+apps/app/.idea/
+apps/app/*.g.dart
+apps/app/*.freezed.dart
+
+# Deno / Edge Functions
+apps/edge/.deno/
+apps/edge/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.pem
+*.key
+service-account.json
+google-credentials.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Git artifacts (brain directory)
+.gemini/

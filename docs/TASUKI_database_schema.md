@@ -1,4 +1,4 @@
-# TASUKI データベース設計書 v1.0
+# TASUKI データベース設計書 v1.1
 
 本ドキュメントは、TASUKI プロジェクト（v8.6 要件準拠）のデータベース構造、テーブル定義、およびセキュリティ設計（RLS）を詳細に記述したものです。
 
@@ -14,6 +14,7 @@ erDiagram
     users ||--|{ memberships : "has role in"
     users ||--|{ handovers : "authors"
     users ||--|{ manual_edits : "edits"
+    users ||--o| admin_users : "may be admin"
 
     handovers ||--o| manuals : "generates (1:0..1)"
     handovers ||--|{ ai_jobs : "processed by"
@@ -50,6 +51,13 @@ erDiagram
         string role "owner/manager/staff"
         string status "active/invited"
         timestamp created_at
+    }
+
+    admin_users {
+        uuid user_id PK, FK
+        string admin_role "super_admin/cs_admin"
+        uuid granted_by FK
+        timestamp granted_at
     }
 
     handovers {
@@ -101,6 +109,7 @@ erDiagram
     }
 ```
 
+
 ---
 
 ## 2. テーブル定義詳細
@@ -133,6 +142,34 @@ erDiagram
 - **store_id**: UUID (PK, FK)
 - **role**: 権限ロール (`owner`, `manager`, `staff`)
 - **status**: 招待状態 (`active`, `invited`, `disabled`)
+
+#### `admin_users`
+システム管理者権限を持つユーザーを管理します（MVP では Optional、Post-PMF で実装推奨）。
+- **user_id**: UUID (PK, FK - `auth.users.id`)
+- **admin_role**: 管理者ロール
+  - `super_admin`: 全機能アクセス、組織作成/停止、AI モデル切替
+  - `cs_admin`: CS/運営向け、監査ログ閲覧、店舗復元
+- **granted_by**: UUID (FK) - 権限を付与した管理者
+- **granted_at**: TIMESTAMP - 権限付与日時
+
+**MVP での代替実装**:
+```sql
+-- auth.users.raw_app_meta_data を使用
+UPDATE auth.users
+SET raw_app_meta_data = jsonb_set(
+  COALESCE(raw_app_meta_data, '{}'::jsonb),
+  '{is_admin}',
+  'true'
+)
+WHERE email = 'admin@example.com';
+```
+
+**Root 権限**:
+- **実装方法**: Supabase Service Role Key（`SUPABASE_SERVICE_ROLE_KEY`）
+- **用途**: スキーママイグレーション、RLS バイパス、緊急時の全データアクセス
+- **アクセス**: 開発者のみ、Supabase CLI または Edge Functions 内で使用
+- **RLS**: 自動的にバイパス
+
 
 ---
 
@@ -213,27 +250,213 @@ Supabase の Row Level Security (RLS) を使用し、データベース層で堅
 | `manuals` | R/W | R/W | R | **Staff は `published` のみ閲覧可** |
 | `manual_edits` | R | R | - | |
 
-### 3.3 RLS ポリシー実装イメージ (Pseudo-code)
+### 3.3 RLS ポリシー完全実装例
 
+#### 3.3.1 manuals テーブル
 ```sql
--- manuals テーブルの閲覧ポリシー
-CREATE POLICY "Enable read access for store members" ON "public"."manuals"
+-- SELECT: Staff は published のみ、Manager/Owner は全て閲覧可
+CREATE POLICY "manuals_select_policy" ON "public"."manuals"
 AS PERMISSIVE FOR SELECT
 TO authenticated
 USING (
   (store_id IN (
-    SELECT store_id FROM memberships WHERE user_id = auth.uid()
+    SELECT store_id FROM memberships WHERE user_id = auth.uid() AND status = 'active'
   ))
   AND
   (
-    -- Manager以上は全て閲覧可
+    -- Manager/Owner は全て閲覧可
     (EXISTS (
       SELECT 1 FROM memberships
-      WHERE user_id = auth.uid() AND store_id = manuals.store_id AND role IN ('owner', 'manager')
+      WHERE user_id = auth.uid()
+        AND store_id = manuals.store_id
+        AND role IN ('owner', 'manager')
+        AND status = 'active'
     ))
     OR
-    -- Staffは公開済みのみ閲覧可
+    -- Staff は公開済みのみ閲覧可
     (status = 'published')
   )
 );
+
+-- INSERT: Manager/Owner のみ
+CREATE POLICY "manuals_insert_policy" ON "public"."manuals"
+AS PERMISSIVE FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = manuals.store_id
+      AND role IN ('owner', 'manager')
+      AND status = 'active'
+  )
+);
+
+-- UPDATE: Manager/Owner のみ
+CREATE POLICY "manuals_update_policy" ON "public"."manuals"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = manuals.store_id
+      AND role IN ('owner', 'manager')
+      AND status = 'active'
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = manuals.store_id
+      AND role IN ('owner', 'manager')
+      AND status = 'active'
+  )
+);
 ```
+
+#### 3.3.2 handovers テーブル
+```sql
+-- SELECT: 同一店舗のメンバー全員
+CREATE POLICY "handovers_select_policy" ON "public"."handovers"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (
+  store_id IN (
+    SELECT store_id FROM memberships
+    WHERE user_id = auth.uid() AND status = 'active'
+  )
+);
+
+-- INSERT: 同一店舗のメンバー全員（Staffも投稿可）
+CREATE POLICY "handovers_insert_policy" ON "public"."handovers"
+AS PERMISSIVE FOR INSERT
+TO authenticated
+WITH CHECK (
+  store_id IN (
+    SELECT store_id FROM memberships
+    WHERE user_id = auth.uid() AND status = 'active'
+  )
+  AND author_id = auth.uid()
+);
+
+-- UPDATE: 自分の投稿 または Manager/Owner
+CREATE POLICY "handovers_update_policy" ON "public"."handovers"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (
+  (author_id = auth.uid())
+  OR
+  (EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = handovers.store_id
+      AND role IN ('owner', 'manager')
+      AND status = 'active'
+  ))
+);
+```
+
+#### 3.3.3 memberships テーブル
+```sql
+-- SELECT: 同じ店舗のメンバーのみ閲覧可
+CREATE POLICY "memberships_select_policy" ON "public"."memberships"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (
+  store_id IN (
+    SELECT store_id FROM memberships
+    WHERE user_id = auth.uid() AND status = 'active'
+  )
+);
+
+-- INSERT: Owner/Manager のみ（スタッフ招待）
+CREATE POLICY "memberships_insert_policy" ON "public"."memberships"
+AS PERMISSIVE FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = memberships.store_id
+      AND role IN ('owner', 'manager')
+      AND status = 'active'
+  )
+);
+
+-- UPDATE: Owner のみ（ロール変更）
+CREATE POLICY "memberships_update_policy" ON "public"."memberships"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM memberships m
+    WHERE m.user_id = auth.uid()
+      AND m.store_id = memberships.store_id
+      AND m.role = 'owner'
+      AND m.status = 'active'
+  )
+);
+```
+
+#### 3.3.4 stores テーブル
+```sql
+-- SELECT: 所属店舗のみ
+CREATE POLICY "stores_select_policy" ON "public"."stores"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (
+  id IN (
+    SELECT store_id FROM memberships
+    WHERE user_id = auth.uid() AND status = 'active'
+  )
+);
+
+-- UPDATE: Owner のみ
+CREATE POLICY "stores_update_policy" ON "public"."stores"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM memberships
+    WHERE user_id = auth.uid()
+      AND store_id = stores.id
+      AND role = 'owner'
+      AND status = 'active'
+  )
+);
+```
+
+### 3.4 RLS 有効化とマイグレーションファイル例
+
+```sql
+-- supabase/migrations/20251201000000_init_schema.sql
+
+-- RLS を有効化
+ALTER TABLE public.manuals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.handovers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
+
+-- ポリシーを適用（上記の各ポリシーを記述）
+-- ... (省略)
+
+-- Service Role はバイパス（Edge Functions 用）
+-- Edge Functions は SUPABASE_SERVICE_ROLE_KEY を使用するため、RLS を自動的にバイパス
+```
+
+### 3.5 テスト用 SQL
+```sql
+-- Staff ユーザーで Draft マニュアルが見えないことを確認
+SET request.jwt.claim.sub = 'staff_user_id';
+SELECT * FROM manuals WHERE status = 'draft'; -- 0件
+
+-- Manager ユーザーで Draft マニュアルが見えることを確認
+SET request.jwt.claim.sub = 'manager_user_id';
+SELECT * FROM manuals WHERE status = 'draft'; -- 見える
+```
+
+---
+
+このRLS設計により、アプリケーション層のロジック無しでデータベース層で堅牢なアクセス制御が実現されます。

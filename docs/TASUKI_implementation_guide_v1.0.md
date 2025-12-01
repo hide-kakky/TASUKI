@@ -37,10 +37,24 @@
 4. 曖昧な領域は `jsonb meta` を保持して OODA の余地を確保。
 
 ### 1.3 RBAC & RLS 骨組み
-- `memberships.role` に `owner/manager/staff` を格納。`root/admin` は別テーブル or Supabase `auth.users.raw_app_meta_data`.
+- `memberships.role` に `owner/manager/staff` を格納。
+- **Root 権限**: Supabase Service Role Key (`SUPABASE_SERVICE_ROLE_KEY`) で実装。開発者専用、RLS 自動バイパス。
+- **Admin 権限** (MVP): `auth.users.raw_app_meta_data.is_admin` で管理。将来的に `admin_users` テーブルに移行。
+  ```sql
+  -- Admin ユーザー設定例
+  UPDATE auth.users
+  SET raw_app_meta_data = jsonb_set(
+    COALESCE(raw_app_meta_data, '{}'::jsonb),
+    '{is_admin}',
+    'true'
+  )
+  WHERE email = 'admin@example.com';
+  ```
 - 初期 RLS 方針：`owner` のみ読み取り可（`auth.uid()` と `memberships.role='owner'` を突き合わせ）。
-- `handovers` / `manuals` は `store_id` ベースでアクセス制御。`root` はサービスロールキーで `alter policy` によるバイパス。
+- `handovers` / `manuals` は `store_id` ベースでアクセス制御。
 - RLS を ON にしたら、Supabase SQL Editor で必ず SELECT/INSERT テストを実施。
+- **参照**: [TASUKI_database_schema.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_database_schema.md) Section 2.1 - admin_users
+
 
 ### 1.4 Mux セットアップ
 - アカウント作成 → トークン発行。
@@ -97,13 +111,17 @@
 #### import_google_doc
 - 入力：`google_doc_url`, `store_id`, `user_id`, `use_ai_formatting` (bool).
 - 処理：
-  1. Google Docs の共有 URL から本文を取得（`cheerio` or Google Docs API）。
+  1. Google Docs の共有 URL から本文を取得（Service Account または公開URLからの直接取得）。
   2. `use_ai_formatting=true` なら Gemini で要約/ステップ/Tips を抽出。
-  3. `manuals` に INSERT。
+  3. manuals` に INSERT。
      - `source_type='legacy_import'`
      - `original_doc_url` を保存
      - `ai_summary` / `ai_steps` / `ai_tips` を保存
      - `status='draft'`
+- **参照**:
+  - [TASUKI_constraints_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_constraints_spec.md) Section 6 - Google Docs API 認証方法
+  - [TASUKI_edge_functions_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_edge_functions_spec.md) Section 4
+
 
 ### 2.5 テスト & DoD
 - 端末で Flow 録画 → タイムライン仮カード → 30〜90 秒内に draft 作成 → Supabase で確認。

@@ -45,51 +45,130 @@
 
 ## 4. 作業分解 & 進行ログ
 
+> **重要**: 各タスクには **完了条件 (DoD: Definition of Done)** を記載しています。自律実行時はこれを必ず確認してください。
+
 ### Phase 1: Infra & DB Setup (Day 1-3)
-- **1.1 リポジトリ & 環境構成**
-  - [ ] プロジェクト構造作成 (`apps/app`, `apps/edge`)
-  - [ ] `.env` / `.envrc` テンプレート作成
-- **1.2 データベース (Supabase)**
-  - [ ] マイグレーションファイル作成 (`supabase/migrations/20251201000000_init_schema.sql`)
-    - `organizations`, `stores`, `users`, `memberships`
-    - `handovers`, `manuals`, `ai_jobs`, `manual_edits`
-  - [ ] RLS ポリシー適用 (Owner only start)
-  - [ ] シードデータ投入 (`supabase/seed.sql`)
-- **1.3 外部サービス連携**
-  - [ ] Mux Webhook 設定確認 (ドキュメントベース)
-  - [ ] Gemini API 疎通テストスクリプト作成 (`scripts/test_gemini.ts`)
+
+#### 1.1 リポジトリ & 環境構成
+- [ ] **プロジェクト構造作成** (`apps/app`, `apps/edge`)
+  - **DoD**: ディレクトリが存在し、`flutter --version` と `deno --version` が実行できる
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 1
+
+- [ ] **環境変数ファイル作成** (`.env` / `.envrc`)
+  - **DoD**: `.env` が `.env.example` に基づいて作成され、全ての必須変数が定義されている
+  - **参照**: [.env.example](file:///Users/hide_kakky/Dev/TASUKI/.env.example)
+  - **セットアップ手順**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md)
+
+#### 1.2 データベース (Supabase)
+- [ ] **マイグレーションファイル作成** (`supabase/migrations/20251201000000_init_schema.sql`)
+  - **DoD**: 全テーブル (`organizations`, `stores`, `users`, `memberships`, `handovers`, `manuals`, `ai_jobs`, `manual_edits`) が定義され、`supabase db push` が成功する
+  - **参照**: [TASUKI_database_schema.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_database_schema.md) Section 2
+
+- [ ] **RLS ポリシー適用** (Owner only start)
+  - **DoD**: 全テーブルで RLS が有効化され、Section 3.3 のポリシーが適用される。Supabase SQL Editor でテストクエリが成功する
+  - **参照**: [TASUKI_database_schema.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_database_schema.md) Section 3.3-3.5
+
+- [ ] **シードデータ投入** (`supabase/seed.sql`)
+  - **DoD**: テスト用の店舗・ユーザー・メンバーシップが作成され、`SELECT * FROM stores` で確認できる
+
+#### 1.3 外部サービス連携
+- [ ] **Mux Webhook 設定確認** (ドキュメントベース)
+  - **DoD**: Mux ダッシュボードに Webhook URL が登録され、"Test webhook" で疎通確認できる
+  - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 3.3
+
+- [ ] **Gemini API 疎通テストスクリプト作成** (`scripts/test_gemini.ts`)
+  - **DoD**: `deno run scripts/test_gemini.ts` が成功し、Gemini から応答が返る
+  - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 4
+
+---
 
 ### Phase 2: Flow → Stock MVP (Day 4-10)
-- **2.1 Flutter アプリ基盤**
-  - [ ] Flutter プロジェクト作成 (`apps/app`)
-  - [ ] 依存パッケージ導入 (`riverpod`, `supabase_flutter`, `isar`, `camera`)
-  - [ ] Auth 画面 & 状態管理実装
-- **2.2 Flow 録画 & アップロード**
-  - [ ] 録画 UI 実装 (`RecordScreen`)
-  - [ ] オフラインキュー実装 (`Isar` - `pending_uploads`)
-  - [ ] Mux アップロード処理 (`VideoService`)
-- **2.3 Edge Functions (Backend)**
-  - [ ] `mux_webhook` 実装 (`supabase/functions/mux_webhook/index.ts`)
-  - [ ] `ai_process_handover` 実装 (`supabase/functions/ai_process_handover/index.ts`)
-    - Gemini 呼び出し (要約・手順・Tips 生成)
-- **2.4 Google Docs 取り込み**
-  - [ ] `import_google_doc` 実装 (`supabase/functions/import_google_doc/index.ts`)
-    - URL から本文取得
-    - Gemini で整形 (Optional)
-    - `manuals` に `source_type='legacy_import'` で保存
+
+#### 2.1 Flutter アプリ基盤
+- [ ] **Flutter プロジェクト作成** (`apps/app`)
+  - **DoD**: `flutter create` が成功し、`flutter run` でサンプルアプリが起動する
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 1
+
+- [ ] **依存パッケージ導入** (`riverpod`, `supabase_flutter`, `isar`, `camera`)
+  - **DoD**: `pubspec.yaml` に全パッケージが記載され、`flutter pub get` が成功する
+
+- [ ] **Auth 画面 & 状態管理実装**
+  - **DoD**: Magic Link ログインが動作し、`authStateProvider` でセッション状態が取得できる
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 2.1
+
+#### 2.2 Flow 録画 & アップロード
+- [ ] **録画 UI 実装** (`RecordScreen`)
+  - **DoD**: 長押しで録画開始/終了でき、動画ファイルがローカルに保存される
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 4.1
+
+- [ ] **オフラインキュー実装** (`Isar` - `pending_uploads`)
+  - **DoD**: オフライン時に録画した動画が `pending_uploads` に保存され、アプリ再起動後も残っている
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 3.1
+
+- [ ] **Mux アップロード処理** (`VideoService`)
+  - **DoD**: ネットワーク復帰時に自動アップロードが開始され、Mux ダッシュボードで Asset が確認できる
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 2.2
+
+#### 2.3 Edge Functions (Backend)
+- [ ] **`mux_webhook` 実装** (`supabase/functions/mux_webhook/index.ts`)
+  - **DoD**: Mux から Webhook を受信し、`handovers` の `hls_url` と `ai_status` が更新される。Supabase Logs で確認
+  - **参照**: [TASUKI_edge_functions_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_edge_functions_spec.md) Section 2
+
+- [ ] **`ai_process_handover` 実装** (`supabase/functions/ai_process_handover/index.ts`)
+  - **DoD**: AI 処理が実行され、`manuals` テーブルに draft が INSERT される。`ai_summary`, `ai_steps`, `ai_tips` が生成される
+  - **参照**: [TASUKI_edge_functions_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_edge_functions_spec.md) Section 3
+
+#### 2.4 Google Docs 取り込み
+- [ ] **`import_google_doc` 実装** (`supabase/functions/import_google_doc/index.ts`)
+  - **DoD**: Google Docs URL から本文を取得し、Gemini で整形して `manuals` に保存。`source_type='legacy_import'` であることを確認
+  - **参照**: [TASUKI_edge_functions_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_edge_functions_spec.md) Section 4
+
+---
 
 ### Phase 3: Manager & Viewer UI (Day 11-20)
-- **3.1 Manager UI**
-  - [ ] マニュアル一覧 & 詳細画面 (`ManagerManualList`, `ManagerManualDetail`)
-  - [ ] 承認アクション (`approve`, `reject`)
-  - [ ] **Google Docs 追加モーダル** 実装
-- **3.2 一般ユーザー閲覧 UI**
-  - [ ] タイムライン表示 (`TimelineScreen`)
-  - [ ] カテゴリ検索 & フィルタ
-  - [ ] マニュアル詳細 (`ManualDetailScreen`) - 動画 & テキスト統合表示
-- **3.3 品質 & 運用**
-  - [ ] `manual_edits` ログ記録実装
-  - [ ] コスト監視 Cron (`supabase/functions/cost_monitor/index.ts`)
+
+#### 3.1 Manager UI
+- [ ] **マニュアル一覧 & 詳細画面** (`ManagerManualList`, `ManagerManualDetail`)
+  - **DoD**: Manager ロールでログインすると Draft 一覧が表示され、詳細をタップすると AI 生成内容が閲覧できる
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 2.3
+
+- [ ] **承認アクション** (`approve`, `reject`)
+  - **DoD**: 承認ボタンで `status='published'` に更新され、`approved_by` と `published_at` が記録される
+
+- [ ] **Google Docs 追加モーダル** 実装
+  - **DoD**: モーダルから Google Docs URL を入力し、`import_google_doc` が呼ばれて Draft が作成される
+
+#### 3.2 一般ユーザー閲覧 UI
+- [ ] **タイムライン表示** (`TimelineScreen`)
+  - **DoD**: Published マニュアルが新着順に表示され、タップで詳細画面に遷移する
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 4.2
+
+- [ ] **カテゴリ検索 & フィルタ**
+  - **DoD**: カテゴリフィルタ（ホール/キッチン等）で Published マニュアルを絞り込める
+
+- [ ] **マニュアル詳細** (`ManualDetailScreen`) - 動画 & テキスト統合表示
+  - **DoD**: サマリ・手順・Tips が1スクロールで閲覧でき、動画がある場合は再生可能
+  - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 4.3
+
+#### 3.3 品質 & 運用
+- [ ] **`manual_edits` ログ記録実装**
+  - **DoD**: Manager が編集を開始/終了すると `manual_edits` に `edit_start_at` / `edit_end_at` が記録される
+
+- [ ] **コスト監視 Cron** (`supabase/functions/cost_monitor/index.ts`)
+  - **DoD**: 1日1回実行され、Mux/Gemini コストが閾値を超えると Slack 通知が送信される
+  - **参照**: [TASUKI_edge_functions_spec.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_edge_functions_spec.md) Section 5
+
+---
+
+### E2E 検証
+全フェーズ完了後、以下のシナリオを実行してください:
+- **参照**: [TASUKI_e2e_scenarios.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_e2e_scenarios.md)
+  - シナリオ1: Flow 録画 → AI 生成 → 承認 (フルパス)
+  - シナリオ2: Google Docs 取り込みフロー
+  - シナリオ3: オフライン → オンライン復帰
+  - シナリオ4: 権限別アクセス制御テスト
+
+---
 
 ---
 
