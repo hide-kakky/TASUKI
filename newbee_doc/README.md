@@ -21,11 +21,16 @@ TASUKIで採用されている主要な技術スタックについての解説�
 - [08_Supabaseとバックエンド](02_Tech_Stack/08_Supabaseとバックエンド.md)
 - [09_AIとGemini](02_Tech_Stack/09_AIとGemini.md)
 - [10_動画処理とMux](02_Tech_Stack/10_動画処理とMux.md)
+- **🔥 上級編**:
+    - [Advanced/01_Riverpodの状態管理パターン](02_Tech_Stack/Advanced/01_Riverpodの状態管理パターン.md)
+    - [Advanced/02_Supabase設計とセキュリティ](02_Tech_Stack/Advanced/02_Supabase設計とセキュリティ.md)
 
 ### 📂 03_Process (開発フロー)
 実際の開発の流れやテストについての指針です。
 - [12_実装の流れ](03_Process/12_実装の流れ.md)
 - [13_テストと環境分離](03_Process/13_テストと環境分離.md)
+- **🔥 上級編**:
+    - [Advanced/01_アーキテクチャと依存注入](03_Process/Advanced/01_アーキテクチャと依存注入.md)
 
 ### 📂 04_Docker_Training (Docker完全攻略) 🐳
 開発環境構築に不可欠なDockerについて、手を動かしながら学ぶハンズオン形式の教材です。
