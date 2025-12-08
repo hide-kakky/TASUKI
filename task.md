@@ -1,37 +1,37 @@
-# TASUKI Implementation Task List
+# TASUKI 実装タスクリスト
 
-## Phase 1: Infra & DB Setup (Day 1-3)
-- [x] **Project Initialization**
-    - [x] Create project structure (`apps/app`, `apps/edge`)
-    - [x] Create `.env` file
-- [x] **Database (Supabase)**
-    - [x] Create migration files (Schema & RLS)
-    - [x] Create `seed.sql`
-    - [x] Apply migrations and seed (`supabase start` / `db reset`)
+## Phase 1: インフラ & DB セットアップ (Day 1-3)
+- [x] **プロジェクト初期化**
+    - [x] プロジェクト構成作成 (`apps/app`, `apps/edge`)
+    - [x] `.env` ファイル作成
+- [x] **データベース (Supabase)**
+    - [x] マイグレーションファイル作成 (Schema & RLS)
+    - [x] `seed.sql` 作成
+    - [x] マイグレーションとシードデータの適用 (`supabase start` / `db reset`)
 - [x] **Edge Functions**
-    - [x] Implement `mux_webhook`
-    - [x] Implement `ai_process_handover`
-    - [x] Implement shared utilities (`supabase-client`, `gemini-client`, `error-handler`)
+    - [x] `mux_webhook` 実装
+    - [x] `ai_process_handover` 実装
+    - [x] 共有ユーティリティ実装 (`supabase-client`, `gemini-client`, `error-handler`)
 
 ## Phase 2: Flow → Stock MVP (Day 4-10)
-- [x] **Flutter Architecture**
-    - [x] Create Flutter project (`apps/app`)
-    - [x] Install dependencies (`riverpod`, `supabase_flutter`, `isar`, etc.)
-- [/] **Flutter Implementation**
-    - [ ] `main.dart` & App initialization
-    - [ ] **Authentication**
-        - [ ] Login Screen (Magic Link)
-        - [ ] Auth State Management (Riverpod)
-    - [x] **Flow (Video Recording)**
-        - [x] Camera/Recorder UI
-        - [x] Offline Queue (`pending_uploads` in Isar)
-        - [x] Mux Upload Logic
-    - [ ] **Timeline/Home**
-        - [ ] Fetch & Display Handovers/Manuals
-- [/] **Backend Integration**
-    - [x] Verify Webhook reception (Impl done)
-    - [x] Verify AI Processing (Impl done)
+- [x] **Flutter アーキテクチャ**
+    - [x] Flutter プロジェクト作成 (`apps/app`)
+    - [x] 依存パッケージインストール (`riverpod`, `supabase_flutter`, `isar`, etc.)
+- [/] **Flutter アプリ実装**
+    - [x] `main.dart` & アプリ初期化
+    - [x] **認証**
+        - [x] ログイン画面 (Magic Link)
+        - [x] Auth 状態管理 (Riverpod)
+    - [x] **Flow (動画撮影)**
+        - [x] カメラ/レコーダー UI
+        - [x] オフラインキュー (`pending_uploads` in Isar)
+        - [x] Mux アップロードロジック
+    - [ ] **タイムライン/ホーム**
+        - [ ] Handovers/Manuals の取得と表示
+- [/] **バックエンド連携**
+    - [x] Webhook 受信確認 (実装完了)
+    - [x] AI 処理確認 (実装完了)
 
 ## Phase 3: Manager & Viewer UI (Day 11-20)
-- [ ] **Manager UI** (Details TBD)
-- [ ] **Viewer UI** (Details TBD)
+- [ ] **管理者 UI** (詳細未定)
+- [ ] **閲覧者 UI** (詳細未定)

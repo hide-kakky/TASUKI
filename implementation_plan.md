@@ -1,49 +1,49 @@
-# TASUKI Implementation Plan - Phase 2 (MVP)
+# TASUKI 実装計画 - Phase 2 (MVP)
 
-## User Review Required
+## ユーザーレビュー必須事項
 > [!IMPORTANT]
-> **Environment Fix Needed**:
-> It appears `supabase start` was executed in the parent `Dev` directory instead of `Dev/TASUKI`.
-> This caused the `seed.sql` warning and prevents me from connecting to the database.
-> **Action**: Please run `supabase stop` in your terminal (at `Dev` directory), then approve this plan. I will then start it correctly in `TASUKI`.
+> **環境修正の必要性**:
+> `supabase start` が `Dev/TASUKI` ではなく親ディレクトリの `Dev` で実行された履歴がありました。
+> これにより `seed.sql` の警告が発生し、データベース接続ができませんでした。
+> **アクション**: 上記は `supabase stop` と `Dev/TASUKI` での再起動により解消済みです。
 
-## Goal Description
-Implement the **Flow (Video) → Stock (Manual)** core loop.
-1. Users can log in (Magic Link).
-2. Users can record "Flow" videos.
-3. Videos are uploaded to Mux and processed by Gemini (Edge Functions) to create "Stock" manuals.
+## ゴール (目的)
+**Flow (動画) → Stock (マニュアル)** のコアループを実装する。
+1. ユーザーはログインできる (Magic Link)。
+2. ユーザーは "Flow" 動画を撮影できる。
+3. 動画は Mux にアップロードされ、Gemini (Edge Functions) によって処理され、"Stock" マニュアルが作成される。
 
-## Proposed Changes
+## 変更内容
 
-### Backend (Supabase)
-Already implemented (Phase 1).
+### バックエンド (Supabase)
+Phase 1 で実装済み。
 - [x] Schema & RLS
 - [x] Edge Functions (`mux_webhook`, `ai_process_handover`)
 
-### Frontend (Flutter) `apps/app`
+### フロントエンド (Flutter) `apps/app`
 
-#### 1. App Initialization ([NEW] `lib/main.dart`)
-- Setup `ProviderScope` (Riverpod)
-- Initialize `Supabase`
-- Initialize `Isar` (Local DB)
+#### 1. アプリ初期化 ([NEW] `lib/main.dart`)
+- `ProviderScope` (Riverpod) のセットアップ
+- `Supabase` の初期化
+- `Isar` (ローカルDB) の初期化
 
-#### 2. Authentication
-- [NEW] `lib/features/auth/presentation/auth_screen.dart`: Magic Link login UI.
-- [NEW] `lib/features/auth/application/auth_notifier.dart`: Auth state management.
+#### 2. 認証機能
+- [NEW] `lib/features/auth/presentation/auth_screen.dart`: Magic Link ログイン UI。
+- [NEW] `lib/features/auth/application/auth_notifier.dart`: Auth 状態管理。
 
-#### 3. Flow (Recording)
-- [NEW] `lib/features/flow/presentation/record_screen.dart`: Camera record button (Long press).
-- [NEW] `lib/features/flow/application/video_service.dart`: Mux upload logic.
-- [NEW] `lib/features/flow/data/upload_queue.dart`: Isar schema for offline queue.
+#### 3. Flow (撮影機能)
+- [NEW] `lib/features/flow/presentation/record_screen.dart`: 長押し録画ボタン付きカメラ画面。
+- [NEW] `lib/features/flow/application/video_service.dart`: Mux アップロードロジック。
+- [NEW] `lib/features/flow/data/upload_queue.dart`: オフラインキュー用 Isar スキーマ。
 
-#### 4. Timeline (Home)
-- [NEW] `lib/features/home/presentation/timeline_screen.dart`: List of Handovers/Manuals.
+#### 4. タイムライン (ホーム画面)
+- [NEW] `lib/features/home/presentation/timeline_screen.dart`: Handovers/Manuals 一覧（仮実装）。
 
-## Verification Plan
+## 検証計画
 
-### Manual Verification
-1. **Fix Env**: Confirm `supabase status` shows running in `TASUKI`.
-2. **Seed Data**: Verify `SELECT * FROM stores` returns data.
-3. **App Launch**: `flutter run` starts the app.
-4. **Login**: Login with `staff1@test.tasuki.com` (Magic Link).
-5. **Record**: Record a 5s video -> Verify it appears in `handovers` table.
+### 手動検証
+1. **環境確認**: `supabase status` が `TASUKI` で稼働していることを確認。
+2. **シードデータ**: `SELECT * FROM stores` でデータが返ることを確認。
+3. **アプリ起動**: `flutter run` でアプリを起動。
+4. **ログイン**: `staff1@test.tasuki.com` でログイン (Magic Link)。
+5. **撮影**: 5秒程度の動画を撮影 -> `handovers` テーブルにレコードが作成されることを確認。
