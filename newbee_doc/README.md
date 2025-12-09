@@ -7,12 +7,18 @@
 
 ### 📂 01_Basis (基礎知識)
 まずはここから読み進めて、全体像と言葉の定義を理解しましょう。
+### 📂 01_Basis (基礎知識)
+まずはここから読み進めて、全体像と言葉の定義を理解しましょう。
 - [01_プログラミングとは](01_Basis/01_プログラミングとは.md)
 - [02_TASUKIアプリの全体像](01_Basis/02_TASUKIアプリの全体像.md)
 - [03_開発環境の理解](01_Basis/03_開発環境の理解.md)
 - [04_データベースとは](01_Basis/04_データベースとは.md)
 - [05_フロントエンドとバックエンド](01_Basis/05_フロントエンドとバックエンド.md)
 - [06_APIとは](01_Basis/06_APIとは.md)
+- [07_HTTPとREST_API](01_Basis/07_HTTPとREST_API.md) (New! ✨)
+- [08_JSONとデータ構造](01_Basis/08_JSONとデータ構造.md) (New! ✨)
+- [09_認証と認可の仕組み](01_Basis/09_認証と認可の仕組み.md) (New! ✨)
+- [10_ターミナルとシェル操作入門](01_Basis/10_ターミナルとシェル操作入門.md) (New! ✨)
 - [11_コードの読み方](01_Basis/11_コードの読み方.md)
 
 ### 📂 02_Tech_Stack (技術詳細)
@@ -21,6 +27,12 @@ TASUKIで採用されている主要な技術スタックについての解説�
 - [08_Supabaseとバックエンド](02_Tech_Stack/08_Supabaseとバックエンド.md)
 - [09_AIとGemini](02_Tech_Stack/09_AIとGemini.md)
 - [10_動画処理とMux](02_Tech_Stack/10_動画処理とMux.md)
+- **🚀 初〜中級編 (New! )**:
+    - [11_Flutterレイアウト入門](02_Tech_Stack/11_Flutterレイアウト入門.md)
+    - [12_Flutter非同期処理 (Future/Stream)](02_Tech_Stack/12_Flutter非同期処理.md)
+    - [13_Widgetライフサイクル](02_Tech_Stack/13_Widgetライフサイクル.md)
+    - [14_Dart言語の基礎](02_Tech_Stack/14_Dart言語の基礎.md)
+    - [16_Supabase_SQL入門](02_Tech_Stack/16_Supabase_SQL入門.md)
 - **🔥 上級編**:
     - [Advanced/01_Riverpodの状態管理パターン](02_Tech_Stack/Advanced/01_Riverpodの状態管理パターン.md)
     - [Advanced/02_Supabase設計とセキュリティ](02_Tech_Stack/Advanced/02_Supabase設計とセキュリティ.md)
@@ -29,6 +41,10 @@ TASUKIで採用されている主要な技術スタックについての解説�
 実際の開発の流れやテストについての指針です。
 - [12_実装の流れ](03_Process/12_実装の流れ.md)
 - [13_テストと環境分離](03_Process/13_テストと環境分離.md)
+- **🚀 初〜中級編 (New! )**:
+    - [14_コードレビューの歩き方](03_Process/14_コードレビューの歩き方.md)
+    - [15_良いIssueの書き方](03_Process/15_良いIssueの書き方.md)
+    - [16_デバッグの基本](03_Process/16_デバッグの基本.md)
 - **🔥 上級編**:
     - [Advanced/01_アーキテクチャと依存注入](03_Process/Advanced/01_アーキテクチャと依存注入.md)
 
@@ -38,6 +54,7 @@ TASUKIで採用されている主要な技術スタックについての解説�
 2. [02_基本コマンドハンズオン](04_Docker_Training/02_基本コマンドハンズオン.md)
 3. [03_Dockerfileによる自作イメージ](04_Docker_Training/03_Dockerfileによる自作イメージ.md)
 4. [04_DockerComposeと実践](04_Docker_Training/04_DockerComposeと実践.md)
+5. [05_Dockerネットワークとデータ永続化](04_Docker_Training/05_Dockerネットワークとデータ永続化.md) (New! ✨)
 - **🔥 上級編**:
     - [Advanced/01_マルチステージビルドと軽量化](04_Docker_Training/Advanced/01_マルチステージビルドと軽量化.md)
 
@@ -46,6 +63,7 @@ TASUKIで採用されている主要な技術スタックについての解説�
 1. [01_K8sの基本概念](05_Kubernetes_Training/01_K8sの基本概念.md)
 2. [02_主要リソース](05_Kubernetes_Training/02_主要リソース.md)
 3. [03_マニフェストファイル](05_Kubernetes_Training/03_マニフェストファイル.md)
+4. [04_Podのデバッグ手法](05_Kubernetes_Training/04_Podのデバッグ手法.md) (New! ✨)
 - **🔥 上級編**:
     - [Advanced/01_HelmとGitOps](05_Kubernetes_Training/Advanced/01_HelmとGitOps.md)
 
@@ -54,6 +72,7 @@ TASUKIで採用されている主要な技術スタックについての解説�
 1. [01_Gitの基本概念](06_Git_Github_Training/01_Gitの基本概念.md)
 2. [02_基本コマンドとフロー](06_Git_Github_Training/02_基本コマンドとフロー.md)
 3. [03_GitHubとチーム開発](06_Git_Github_Training/03_GitHubとチーム開発.md)
+4. [04_ブランチ戦略](06_Git_Github_Training/04_ブランチ戦略.md) (New! ✨)
 - **🔥 上級編**:
     - [Advanced/01_リベースとCI_CD](06_Git_Github_Training/Advanced/01_リベースとCI_CD.md)
 
