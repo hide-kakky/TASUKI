@@ -48,3 +48,24 @@ K8sの中にあるDBや管理画面を、手元のPCから直接触りたい時�
 kubectl port-forward [ポッド名] 5432:5432
 ```
 これで、K8s内のPostgresに手元のPCから `localhost:5432` で接続できるようになります。デバッグに最強です。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 補足 |
+|------|------|-----|
+| **Pending** | 保留中 | 場所空き待ち or 準備中 |
+| **CrashLoopBackOff** | 起動するがすぐ死ぬ | 「起動→エラー終了」の無限ループ |
+| **ImagePullBackOff** | イメージ取れない | イメージ名間違い or 権限なし |
+| **Events** | イベントログ | `describe` で見れる「何が起きたか」の履歴 |
+| **Port Forward** | ポート転送 | トンネルを掘ってローカルから接続する技 |
+
+## 🛠️ コマンド集 (Debug)
+
+| コマンド | 説明 |
+|---|---|
+| `kubectl logs [pod]` | ログを表示 |
+| `kubectl logs -f [pod]` | ログを流し見 (follow) |
+| `kubectl exec -it [pod] -- [cmd]` | コンテナの中でコマンドを実行 |
+| `kubectl port-forward [pod] [local]:[remote]` | ローカルへのポート転送を開始 |

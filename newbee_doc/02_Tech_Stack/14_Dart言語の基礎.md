@@ -64,3 +64,25 @@ var paint = Paint()
   ..strokeCap = StrokeCap.round;
 ```
 インスタンス生成と設定をまとめて書けるので、コードがスッキリします。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 例 |
+|------|------|-----|
+| **Null Safety** | Null参照エラーを防ぐ仕組み | `String?` vs `String` |
+| **final** | 一度しか代入できない変数 | Javaのfinalと同じ |
+| **const** | コンパイル時に決まる定数 | C++のconstに近い |
+| **late** | 初期化を遅らせるキーワード | `late String name;` |
+| **Arrow Function (アロー関数)** | `=>` で書く短い関数 | `(x) => x * 2` |
+| **Cascade (カスケード)** | `..` で連続呼び出し | ビルダーパターンに近い |
+
+## 🛠️ コマンド集 (Dart CLI)
+
+| コマンド | 説明 |
+|---|---|
+| `dart run` | Dartファイルを実行する |
+| `dart format` | コードを綺麗に整形する |
+| `dart fix` | 自動修正を適用する |
+| `dart pub add <package>` | ライブラリを追加する |

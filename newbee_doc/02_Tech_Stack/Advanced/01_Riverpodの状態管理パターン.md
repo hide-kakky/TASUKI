@@ -71,7 +71,17 @@ final age = ref.watch(userProvider.select((user) => user.age));
 ```
 - **ウィジェットを分割する**: 頻繁に更新される部分は、小さなウィジェット（`Consumer`）として切り出す。
 
-## まとめ
-- 状態は `Notifier` でカプセル化する。
-- UI は `AsyncValue` (`data`, `loading`, `error`) をハンドリングするだけにする。
-- ロジックと UI を明確に分離することが、堅牢なアプリへの第一歩です。
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 関連 |
+|------|------|-----|
+| **Dependency Injection (DI)** | 依存性の注入 | テストしやすくする技術 |
+| **Provider** | インスタンスの提供係 | Riverpodの基本 |
+| **Notifier** | 状態を管理するクラス | StateControllerの進化版 |
+| **AsyncValue** | 非同期データの状態管理 | data/loading/error |
+| **Consumer** | Providerを使うWidget | `ref` を受け取る |
+| **Override** | Providerの中身を差し替える | テストでMockを使う時に必須 |
+| **Family** | 引数付きのProvider | IDを指定して取得する場合など |
+

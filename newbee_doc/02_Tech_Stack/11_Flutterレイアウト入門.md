@@ -67,3 +67,24 @@ Row(
 
 - `MediaQuery.of(context).size` で画面サイズを取得できます。
 - `LayoutBuilder` を使うと、親のサイズに応じてレイアウトを変えられます。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | イメージ |
+|------|------|-----|
+| **Row** | 横並びにするやつ | 🚃🚃🚃 |
+| **Column** | 縦並びにするやつ | 🍡 |
+| **Stack** | 重ねるやつ | 🍔 |
+| **Expanded** | 余白を埋めるやつ | 🎈 |
+| **Padding** | すき間を開けるやつ | 📦 |
+| **Main Axis** | 主軸（並ぶ方向） | Rowなら横、Columnなら縦 |
+| **Cross Axis** | 交差軸（直角方向） | Rowなら縦、Columnなら横 |
+
+## 🛠️ コマンド集 (Shortcuts)
+
+| コマンド | 説明 |
+|---|---|
+| `Cmd + .` (Mac) | WidgetをWrapするメニューを出す（超重要！） |
+| - | `Wrap with Column` や `Wrap with Padding` が一瞬でできる |

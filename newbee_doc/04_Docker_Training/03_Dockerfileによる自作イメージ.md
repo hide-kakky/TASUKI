@@ -62,3 +62,32 @@ docker run -d -p 8888:80 --name my-custom-app my-custom-nginx
 ## 次のステップ
 アプリが複雑になると、Webサーバーだけでなく、データベース（DB）なども必要になります。
 複数のコンテナをまとめて管理する `Docker Compose` について学びましょう。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 補足 |
+|------|------|-----|
+| **Dockerfile** | イメージの設計図 | 「これをインストールして、あれをコピーして...」と書く |
+| **Build (ビルド)** | イメージを作成する | 設計図から製品を作る工程 |
+| **Base Image** | 土台となるイメージ | `FROM nginx` の部分 |
+| **Tag** | イメージの名前・バージョン | `nginx:latest` の `:latest` 部分 |
+| **Context** | ビルドの範囲 | `docker build .` の ドット(`.`) のこと |
+
+## 🛠️ コマンド集 (Docker Build)
+
+| コマンド | 説明 |
+|---|---|
+| `docker build -t [name] .` | 現在のディレクトリのDockerfileからイメージを作成 |
+| `docker build -f [file] .` | ファイル名を指定してビルド（デフォルトはDockerfile） |
+
+### Dockerfileの命令
+
+| 命令 | 説明 |
+|---|---|
+| `FROM` | ベースイメージの指定（必須） |
+| `COPY` | PC上のファイルをイメージの中にコピー |
+| `RUN` | イメージ作成時に実行するコマンド（`apt-get install`など） |
+| `CMD` | コンテナ起動時に実行されるデフォルトコマンド |
+| `WORKDIR` | 作業ディレクトリの変更（`cd`と同じ） |

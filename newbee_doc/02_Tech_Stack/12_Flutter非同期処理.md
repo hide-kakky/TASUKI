@@ -59,3 +59,17 @@ Widget build(BuildContext context, WidgetRef ref) {
 }
 ```
 昔は `FutureBuilder` を使っていましたが、今は `AsyncValue` (`ref.watch`) が圧倒的に楽で安全です。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 例 |
+|------|------|-----|
+| **Future** | 未来の値を表す型 | 1回だけ返る（HTTPリクエストなど） |
+| **Stream** | 流れてくる値を表す型 | 何回も返る（位置情報、チャットなど） |
+| **async** | 非同期関数であることを宣言する | `Future<void> func() async {...}` |
+| **await** | Futureの完了を待つ | `final data = await getData();` |
+| **AsyncValue** | 非同期の状態（ロード中/データ/エラー）を扱う型 | Riverpodで使う |
+| **Promise** | FutureのJavaScript版 | ほぼ同じ意味 |
+

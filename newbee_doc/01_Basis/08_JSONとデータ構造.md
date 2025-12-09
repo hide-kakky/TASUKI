@@ -66,3 +66,26 @@ class User {
 }
 ```
 TASUKI では `freezed` というパッケージを使って、これらのコードを自動生成しています。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 例 |
+|------|------|-----|
+| **JSON** | JavaScript Object Notation | データ形式の規格 |
+| **キー (Key)** | データの名前（ラベル） | `"name"` |
+| **値 (Value)** | データの中身 | `"Tanaka"` |
+| **オブジェクト** | `{}` で囲まれたデータの集まり | `{"id": 1}` |
+| **配列 (Array)** | `[]` で囲まれたリスト | `[1, 2, 3]` |
+| **シリアライズ** | プログラムのオブジェクト → JSON文字列 | `jsonEncode()` |
+| **デシリアライズ** | JSON文字列 → プログラムのオブジェクト | `jsonDecode()` |
+
+## 🛠️ コマンド集 (Dart/Flutter)
+
+| メソッド | 説明 |
+|---|---|
+| `jsonEncode(data)` | データをJSON文字列に変換する |
+| `jsonDecode(jsonString)` | JSON文字列をMapやListに変換する |
+| `User.fromJson(json)` | MapからUserクラスを作る（よく作るファクトリ） |
+| `user.toJson()` | UserクラスをMapにする（よく作るメソッド） |

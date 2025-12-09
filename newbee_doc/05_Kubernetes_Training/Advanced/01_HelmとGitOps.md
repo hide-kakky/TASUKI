@@ -53,3 +53,26 @@ helm install my-app ./charts/my-app -f values-prod.yaml
 ## まとめ
 上級者のK8s運用は、**「人間が直接コマンドを打たない」** 環境を目指します。
 全てをコード（Git）で管理し、適用は自動化ツールに任せる。これが **Infrastructure as Code (IaC)** の最終形です。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 補足 |
+|------|------|-----|
+| **Helm** | パッケージマネージャ | K8s版のyum/apt/npm |
+| **Chart (チャート)** | パッケージ | マニフェストのテンプレート集 |
+| **Values** | 設定値 | 環境ごとに書き換える変票 (`values.yaml`) |
+| **GitOps** | 運用手法 | 「Gitが正義」。自動同期システム。 |
+| **ArgoCD** | GitOpsツール | K8sの中で動く同期エージェント |
+| **IaC** | Infrastructure as Code | インフラをコードで管理すること |
+| **Push / Pull** | デプロイ方式 | Push=外からねじ込む / Pull=中から取りに行く |
+
+## 🛠️ コマンド集 (Helm)
+
+| コマンド | 説明 |
+|---|---|
+| `helm install [name] [chart]` | チャートをインストール（初回） |
+| `helm upgrade [name] [chart]` | 設定やバージョンを更新 |
+| `helm list` | インストール済みのチャート一覧 |
+| `helm uninstall [name]` | 削除 |

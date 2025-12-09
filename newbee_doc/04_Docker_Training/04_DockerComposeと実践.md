@@ -65,3 +65,25 @@ TASUKIの開発において、以下のことが理解できていれば合格�
 - 「コンテナ消しちゃった！」→ 大丈夫、イメージがあるから何度でも作り直せる。
 
 さあ、自信を持って開発に戻りましょう！🚀
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 補足 |
+|------|------|-----|
+| **Docker Compose** | 複数コンテナ管理ツール | オーケストレーションの入門 |
+| **docker-compose.yml** | 構成定義ファイル | 昔は `docker-compose`、今は `docker compose` (ハイフンなし推奨) |
+| **Service (サービス)** | Compose内でのコンテナの呼び名 | `web`, `db` など |
+| **Depends On** | 依存関係 | 「DBが立ち上がってからアプリを起動」などが制御できる |
+| **Environment Variable** | 環境変数 | DBのパスワードなどを設定する |
+
+## 🛠️ コマンド集 (Docker Compose)
+
+| コマンド | 説明 |
+|---|---|
+| `docker compose up -d` | 全サービスをバックグラウンドで起動 |
+| `docker compose down` | 全サービスを停止・削除 |
+| `docker compose logs -f` | 全サービスのログを流し見する |
+| `docker compose ps` | Composeで管理されているコンテナの状態確認 |
+| `docker compose exec [service] bash` | 指定したサービスのコンテナの中に入る |

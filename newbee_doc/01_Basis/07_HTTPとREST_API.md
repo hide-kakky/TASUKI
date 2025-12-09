@@ -47,3 +47,23 @@ HyperText Transfer Protocol の略で、「リクエスト（お願い）」と�
 | `POST /delete_user?id=1` | `DELETE /users/1` |
 
 Flutter開発では、`repository` 層などのメソッド名もこれに合わせて `getUsers()`, `createUser()` と命名するのが一般的です。
+
+---
+
+## 📚 用語集 (Glossary)
+
+| 用語 | 意味 | 例 |
+|------|------|-----|
+| **HTTP** | Webでデータをやり取りする手順 | - |
+| **メソッド** | 「何をしたいか」を表す動詞 | GET, POST |
+| **ステータスコード** | 結果を表す3桁の数字 | 200, 404, 500 |
+| **ヘッダー (Header)** | 通信の「付帯情報」 | `Content-Type: application/json` |
+| **ボディ (Body)** | 通信の「中身」 | `{"name": "Tanaka"}` |
+| **クエリパラメータ** | URLの末尾で条件を指定するもの | `?id=1` |
+
+## 🛠️ コマンド集 (Common Tools)
+
+| コマンド | 説明 | 例 |
+|---|---|---|
+| `curl` | ターミナルからHTTPリクエストを送るツール | `curl https://api.example.com` |
+| `Postman` | GUIでAPIをテストできるツール | (アプリ名) |
