@@ -30,6 +30,8 @@
   - env 名を `SERVICE_ROLE_KEY` に統一、stg/prod secrets 再注入済み。
   - `ai_process_handover` `/test-env` は dev のみ有効、stg/prod は 404 で保護済み。
   - Edge Functions (`ai_process_handover`, `mux_webhook`, `create_mux_upload_url`) を stg/prod に再デプロイ。
+  - `supabase/config.toml` に関数ごとの `verify_jwt=false` を明記（デプロイ時に毎回反映する運用）。
+  - `mux_webhook` に `MUX_WEBHOOK_SECRET` を使った HMAC 署名検証を実装。
 - **ブロッカー / 依存**：
   - フロント（Flutter）の Flow/Timeline/Manager UI 実装が未着手。
   - 本番/ステージングでの Mux Webhook 実環境テストは未実施。
@@ -81,6 +83,7 @@
   - **DoD**: Mux ダッシュボードに Webhook URL が登録され、"Test webhook" で疎通確認できる
   - **Status**: Edge Functions デプロイ済み。ダッシュボード設定と疎通テストは未実施。
   - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 3.3
+  - **NOTE**: `supabase/config.toml` に `verify_jwt=false` を記載し、デプロイ時に JWT を常時OFF。代わりに `MUX_WEBHOOK_SECRET` を用いた HMAC 検証を実装済み。
 
 - [ ] **Gemini API 疎通テストスクリプト作成** (`scripts/test_gemini.ts`)
   - **DoD**: `deno run scripts/test_gemini.ts` が成功し、Gemini から応答が返る

@@ -3,13 +3,39 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from '../_shared/supabase-client.ts';
 import { handleError, AppError } from '../_shared/error-handler.ts';
 
-// Placeholder for Mux Signature Verification
-// In production, use crypto.subtle to verify HMAC-SHA256
-function verifyMuxSignature(req: Request, signature: string | null): boolean {
-  // TODO: Implement actual verification using MUX_WEBHOOK_SECRET
-  // const secret = Deno.env.get('MUX_WEBHOOK_SECRET');
-  // ... hmac logic ...
-  return true;
+async function verifyMuxSignature(rawBody: string, signatureHeader: string | null): Promise<boolean> {
+  const secret = Deno.env.get('MUX_WEBHOOK_SECRET');
+  if (!secret || !signatureHeader) return false;
+
+  // Mux signature format: t=timestamp,v1=signature
+  const parts = signatureHeader.split(',').map((p) => p.trim());
+  const timestampPart = parts.find((p) => p.startsWith('t='));
+  const sigPart = parts.find((p) => p.startsWith('v1='));
+  if (!timestampPart || !sigPart) return false;
+
+  const timestamp = timestampPart.replace('t=', '');
+  const signature = sigPart.replace('v1=', '');
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const data = encoder.encode(`${timestamp}.${rawBody}`);
+  const mac = await crypto.subtle.sign('HMAC', key, data);
+  const expected = Array.from(new Uint8Array(mac))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  // constant-time compare
+  if (expected.length !== signature.length) return false;
+  let result = 0;
+  for (let i = 0; i < expected.length; i++) {
+    result |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 interface MuxWebhookPayload {
@@ -31,12 +57,14 @@ interface MuxWebhookPayload {
 serve(async (req) => {
   try {
     // 1. Webhook Signature Verification
+    const rawBody = await req.text();
     const signature = req.headers.get('mux-signature');
-    if (!verifyMuxSignature(req, signature)) {
+    const valid = await verifyMuxSignature(rawBody, signature);
+    if (!valid) {
       throw new AppError('INVALID_SIGNATURE', 'Invalid webhook signature', 401);
     }
 
-    const payload: MuxWebhookPayload = await req.json();
+    const payload: MuxWebhookPayload = JSON.parse(rawBody);
     console.log(`Received webhook: ${payload.type} for asset ${payload.object.id}`);
 
     if (payload.type !== 'video.asset.ready') {
