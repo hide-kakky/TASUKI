@@ -39,7 +39,7 @@
 
 ### 1.3 RBAC & RLS 骨組み
 - `memberships.role` に `owner/manager/staff` を格納。
-- **Root 権限**: Supabase Service Role Key (`SUPABASE_SERVICE_ROLE_KEY`) で実装。開発者専用、RLS 自動バイパス。
+- **Root 権限**: Supabase Service Role Key (`SERVICE_ROLE_KEY`) で実装。開発者専用、RLS 自動バイパス。
 - **Admin 権限** (MVP): `auth.users.raw_app_meta_data.is_admin` で管理。将来的に `admin_users` テーブルに移行。
   ```sql
   -- Admin ユーザー設定例

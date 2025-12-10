@@ -378,7 +378,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { createHmac } from 'https://deno.land/std@0.177.0/node/crypto.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')!;
 const muxWebhookSecret = Deno.env.get('MUX_WEBHOOK_SECRET')!;
 
 interface MuxWebhookPayload {
@@ -509,7 +509,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseServiceKey = Deno.env.get('SERVICE_ROLE_KEY')!;
 const geminiApiKey = Deno.env.get('GEMINI_API_KEY')!;
 
 const GEMINI_TIMEOUT_MS = 90000; // 90秒

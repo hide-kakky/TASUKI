@@ -60,7 +60,7 @@ cp .env.example .env.prod
 2. 以下をコピーして `.env` に記載:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon public** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role** (⚠️秘匿!) → `SUPABASE_SERVICE_ROLE_KEY`
+   - **service_role** (⚠️秘匿!) → `SERVICE_ROLE_KEY`
 
 ### 2.3 Supabase CLI インストール
 ```bash
@@ -86,6 +86,15 @@ supabase status
 ローカル環境ではメールは実際には送信されず、Inbucket に捕捉されます。
 - URL: `http://localhost:54324`
 - テスト時の認証確認に使用します。
+
+**Auth の扱い（dev方針）**:
+- RLS/認証は基本そのまま。テストユーザーで運用し、Magic Link は Inbucket ログで確認する。
+- Edge Functions を単体確認するときだけ、ローカルで `--no-verify-jwt` を付けて起動して良い（本番/ステージングでは禁止）。
+  ```bash
+  supabase functions serve ai_process_handover --env-file supabase/.env --no-verify-jwt
+  curl http://127.0.0.1:54321/functions/v1/ai_process_handover/test-env
+  ```
+- RLSを切る/サービスロールをクライアントへ渡すようなバイパスは禁止。
 
 ### 2.5 クラウド環境へのリンク (デプロイ用)
 ```bash

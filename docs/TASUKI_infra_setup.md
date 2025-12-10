@@ -22,7 +22,7 @@
 # Supabase (Local or Remote)
 SUPABASE_URL="https://<project>.supabase.co"
 SUPABASE_ANON_KEY="eyJ..."
-SUPABASE_SERVICE_ROLE_KEY="eyJ..." # Edge Functions 用 (Server-side only)
+SERVICE_ROLE_KEY="eyJ..." # Edge Functions 用 (Server-side only)
 
 # Mux
 MUX_TOKEN_ID="your-mux-token-id"

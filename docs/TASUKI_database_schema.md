@@ -165,7 +165,7 @@ WHERE email = 'admin@example.com';
 ```
 
 **Root 権限**:
-- **実装方法**: Supabase Service Role Key（`SUPABASE_SERVICE_ROLE_KEY`）
+- **実装方法**: Supabase Service Role Key（`SERVICE_ROLE_KEY`）
 - **用途**: スキーママイグレーション、RLS バイパス、緊急時の全データアクセス
 - **アクセス**: 開発者のみ、Supabase CLI または Edge Functions 内で使用
 - **RLS**: 自動的にバイパス
@@ -443,7 +443,7 @@ ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
 -- ... (省略)
 
 -- Service Role はバイパス（Edge Functions 用）
--- Edge Functions は SUPABASE_SERVICE_ROLE_KEY を使用するため、RLS を自動的にバイパス
+-- Edge Functions は SERVICE_ROLE_KEY を使用するため、RLS を自動的にバイパス
 ```
 
 ### 3.5 テスト用 SQL

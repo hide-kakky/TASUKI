@@ -123,7 +123,7 @@ serve(async (req) => {
     const payload: MuxWebhookPayload = await req.json();
 
     // 2. 対象handoverを検索
-    const supabase = createClient(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const supabase = createClient(Deno.env.get('SERVICE_ROLE_KEY')!);
     const { data: handover, error } = await supabase
       .from('handovers')
       .select('id, store_id')
@@ -233,7 +233,7 @@ function generateUserPrompt(videoUrl: string, language: string): string {
 serve(async (req) => {
   try {
     const { handover_id }: AiProcessHandoverInput = await req.json();
-    const supabase = createClient(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const supabase = createClient(Deno.env.get('SERVICE_ROLE_KEY')!);
 
     // 1. handover 取得
     const { data: handover } = await supabase

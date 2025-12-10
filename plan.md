@@ -24,21 +24,23 @@
 ---
 
 ## 2. 現状スナップショット
-- **フェーズ**：Phase 1 (Day 1-3) - インフラ & DB の芯
-- **期間**：Day 1
+- **フェーズ**：Phase 2 着手（バックエンドは Flow→Stock ライン実装済み、フロント未完）
 - **主要担当**：Codex (AI Agent)
 - **最新決定 / アクション**：
-  - `NOTE: 計画を詳細化し、自律実行可能なレベルに分解しました。`
+  - env 名を `SERVICE_ROLE_KEY` に統一、stg/prod secrets 再注入済み。
+  - `ai_process_handover` `/test-env` は dev のみ有効、stg/prod は 404 で保護済み。
+  - Edge Functions (`ai_process_handover`, `mux_webhook`, `create_mux_upload_url`) を stg/prod に再デプロイ。
 - **ブロッカー / 依存**：
-  - `RISK: Supabase / Mux / Gemini の API キー設定が必要。`
+  - フロント（Flutter）の Flow/Timeline/Manager UI 実装が未着手。
+  - 本番/ステージングでの Mux Webhook 実環境テストは未実施。
 
 ---
 
 ## 3. マイルストーンボード
 | # | マイルストーン | ステータス | Exit 条件 / 実績 | 目標日 | オーナー | 次アクション |
 |---|----------------|-----------|------------------|--------|----------|--------------|
-| 1 | **Infra & DB Setup** | ▶ | Supabase スキーマ適用、RLS 設定、Mux/Gemini 疎通確認 | Day 3 | Codex | DBスキーマ作成 |
-| 2 | **Flow → Stock MVP** | □ | Flow 録画→Mux→Gemini→Draft 生成、**Google Docs 取り込み** | Day 10 | Codex |  |
+| 1 | **Infra & DB Setup** | ▶ | スキーマ/RLS/seed 適用、Mux/Gemini secrets 設定、Edge Functions デプロイ | Day 3 | Codex | Mux Webhook 実環境テスト |
+| 2 | **Flow → Stock MVP** | ▶ | Flow 録画→Mux→Gemini→Draft 生成、**Google Docs 取り込み** | Day 10 | Codex | Flutter Flow/Timeline 実装 |
 | 3 | **Manager & Viewer UI** | □ | Manager 承認フロー、**一般ユーザー閲覧 UI**、AI 品質ログ | Day 20 | Codex |  |
 
 ---
@@ -56,8 +58,8 @@
   - **参照**: [TASUKI_flutter_architecture.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_flutter_architecture.md) Section 1
 
 - [x] **環境変数ファイル作成** (`.env` / `.envrc`)
-  - **DoD**: `.env` が `.env.example` に基づいて作成され、全ての必須変数が定義されている
-  - **参照**: [.env.example](file:///Users/hide_kakky/Dev/TASUKI/.env.example)
+  - **DoD**: `.env` が `.env.example` に基づいて作成され、全ての必須変数が定義されている。`SERVICE_ROLE_KEY` に統一済み。stg/prod secrets 注入済み。
+  - **参照**: [supabase/.env.example](supabase/.env.example), [apps/app/.env.example](apps/app/.env.example)
   - **セットアップ手順**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md)
 
 #### 1.2 データベース (Supabase)
@@ -77,10 +79,12 @@
 #### 1.3 外部サービス連携
 - [ ] **Mux Webhook 設定確認** (ドキュメントベース)
   - **DoD**: Mux ダッシュボードに Webhook URL が登録され、"Test webhook" で疎通確認できる
+  - **Status**: Edge Functions デプロイ済み。ダッシュボード設定と疎通テストは未実施。
   - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 3.3
 
 - [ ] **Gemini API 疎通テストスクリプト作成** (`scripts/test_gemini.ts`)
   - **DoD**: `deno run scripts/test_gemini.ts` が成功し、Gemini から応答が返る
+  - **Status**: 未着手（`GEMINI_API_KEY` は各環境に設定済み）
   - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 4
 
 ---

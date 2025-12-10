@@ -41,7 +41,7 @@ supabase db seed
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_STAGING_PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbG... # Secretsに登録
+SERVICE_ROLE_KEY=eyJhbG... # Secretsに登録
 
 # Mux (Staging専用アカウント推奨)
 MUX_TOKEN_ID=staging-token-id
