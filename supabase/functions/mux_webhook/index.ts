@@ -44,7 +44,7 @@ serve(async (req) => {
     }
 
     // 2. Find target handover
-    const supabase = createClient(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const supabase = createClient(Deno.env.get('SERVICE_ROLE_KEY')!);
     const { data: handover, error } = await supabase
       .from('handovers')
       .select('id, store_id')

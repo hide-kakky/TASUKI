@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window", "deno.ns", "esnext"],
+    "types": ["https://deno.land/std@0.168.0/http/mod.ts"]
+  },
+  "imports": {},
+  "deploy": {
+    "verify_jwt": false
+  }
+}

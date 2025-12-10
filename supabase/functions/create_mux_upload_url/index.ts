@@ -54,7 +54,7 @@ serve(async (req) => {
     // Let's use `mux_asset_id` for now or assume we update it later.
     // Actually, usually we pass `passthrough: handover_id`.
 
-    const supabase = createClient(Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const supabase = createClient(Deno.env.get('SERVICE_ROLE_KEY')!);
 
     // Get User ID from Auth context (but Edge Function raw call might not have it if not signed?
     // standard `supabase.functions.invoke` passes Auth header).
