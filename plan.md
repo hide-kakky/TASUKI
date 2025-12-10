@@ -31,7 +31,8 @@
   - `ai_process_handover` `/test-env` は dev のみ有効、stg/prod は 404 で保護済み。
   - Edge Functions (`ai_process_handover`, `mux_webhook`, `create_mux_upload_url`) を stg/prod に再デプロイ。
   - `supabase/config.toml` に関数ごとの `verify_jwt=false` を明記（デプロイ時に毎回反映する運用）。
-  - `mux_webhook` に `MUX_WEBHOOK_SECRET` を使った HMAC 署名検証を実装。
+  - `mux_webhook` に `MUX_WEBHOOK_SECRET` を使った HMAC 署名検証を実装し、stg/prod で署名付きテスト成功。
+  - Gemini 呼び出しでの `responseMimeType` 指定を削除（SDK未対応のため）し再デプロイ済み。
   - dev だけでダミー JWT を使った「常時ログイン」を許可する方針（`DEV_FAKE_JWT` を dev .env にのみ置き、devフレーバーで `setSession` などを通す。stg/prod には流さない）。
 - **ブロッカー / 依存**：
   - フロント（Flutter）の Flow/Timeline/Manager UI 実装が未着手。
@@ -82,7 +83,7 @@
 #### 1.3 外部サービス連携
 - [ ] **Mux Webhook 設定確認** (ドキュメントベース)
   - **DoD**: Mux ダッシュボードに Webhook URL が登録され、"Test webhook" で疎通確認できる
-  - **Status**: Edge Functions デプロイ済み。ダッシュボード設定と疎通テストは未実施。
+  - **Status**: Edge Functions デプロイ済み。署名付き手動テストを stg/prod で実施し成功（ダミー playback のため AI は失敗/ai_running→手動で ready_for_ai に戻し済み）。
   - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 3.3
   - **NOTE**: `supabase/config.toml` に `verify_jwt=false` を記載し、デプロイ時に JWT を常時OFF。代わりに `MUX_WEBHOOK_SECRET` を用いた HMAC 検証を実装済み。
   - **NOTE**: dev 専用のダミーJWTを `.env` に入れて dev フレーバーだけで `setSession` する運用を許容（stg/prod には絶対に含めない）。
