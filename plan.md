@@ -32,6 +32,7 @@
   - Edge Functions (`ai_process_handover`, `mux_webhook`, `create_mux_upload_url`) を stg/prod に再デプロイ。
   - `supabase/config.toml` に関数ごとの `verify_jwt=false` を明記（デプロイ時に毎回反映する運用）。
   - `mux_webhook` に `MUX_WEBHOOK_SECRET` を使った HMAC 署名検証を実装。
+  - dev だけでダミー JWT を使った「常時ログイン」を許可する方針（`DEV_FAKE_JWT` を dev .env にのみ置き、devフレーバーで `setSession` などを通す。stg/prod には流さない）。
 - **ブロッカー / 依存**：
   - フロント（Flutter）の Flow/Timeline/Manager UI 実装が未着手。
   - 本番/ステージングでの Mux Webhook 実環境テストは未実施。
@@ -84,6 +85,7 @@
   - **Status**: Edge Functions デプロイ済み。ダッシュボード設定と疎通テストは未実施。
   - **参照**: [TASUKI_setup_guide.md](file:///Users/hide_kakky/Dev/TASUKI/docs/TASUKI_setup_guide.md) Section 3.3
   - **NOTE**: `supabase/config.toml` に `verify_jwt=false` を記載し、デプロイ時に JWT を常時OFF。代わりに `MUX_WEBHOOK_SECRET` を用いた HMAC 検証を実装済み。
+  - **NOTE**: dev 専用のダミーJWTを `.env` に入れて dev フレーバーだけで `setSession` する運用を許容（stg/prod には絶対に含めない）。
 
 - [ ] **Gemini API 疎通テストスクリプト作成** (`scripts/test_gemini.ts`)
   - **DoD**: `deno run scripts/test_gemini.ts` が成功し、Gemini から応答が返る

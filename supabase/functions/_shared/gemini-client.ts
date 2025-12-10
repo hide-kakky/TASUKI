@@ -45,10 +45,8 @@ export async function callGemini(videoUrl: string, language: string): Promise<Ai
 
   try {
     const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + userPrompt }] }],
-        generationConfig: {
-            responseMimeType: "application/json",
-        }
+      contents: [{ role: "user", parts: [{ text: SYSTEM_PROMPT + "\n\n" + userPrompt }] }],
+      // Note: responseMimeType is not supported in the current SDK; prompt enforces JSON instead.
     });
 
     const response = await result.response;
