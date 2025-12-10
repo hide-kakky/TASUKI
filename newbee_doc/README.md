@@ -23,8 +23,11 @@
     - [13_ネットワークとセキュリティ](01_Basis/13_ネットワークとセキュリティ.md)
     - [14_アルゴリズムとデータ構造](01_Basis/14_アルゴリズムとデータ構造.md)
 
-### 📂 02_Tech_Stack (技術詳細)
-TASUKIで採用されている主要な技術スタックについての解説です。
+### 📚 2. TASUKI Tech Stack (技術スタック)
+
+<img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" /> <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" /> <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" /> <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" /> <img src="https://img.shields.io/badge/Gemini-8E75B2?style=for-the-badge&logo=google-gemini&logoColor=white" />
+
+- **[00. アーキテクチャと技術スタック図解](newbee_doc/02_Tech_Stack/00_アーキテクチャと技術スタック図解.md)** 👈 **NEW!**
 - [07_Flutterとモバイルアプリ](02_Tech_Stack/07_Flutterとモバイルアプリ.md)
 - [08_Supabaseとバックエンド](02_Tech_Stack/08_Supabaseとバックエンド.md)
 - [09_AIとGemini](02_Tech_Stack/09_AIとGemini.md)

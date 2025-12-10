@@ -1,8 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tasuki_app/main.dart';
-import 'package:tasuki_app/features/home/presentation/timeline_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});

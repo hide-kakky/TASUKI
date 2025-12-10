@@ -5,6 +5,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
 import 'package:tasuki_app/features/flow/data/upload_queue.dart';
 import 'package:tasuki_app/core/providers.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tasuki_app/features/auth/presentation/auth_screen.dart';
+import 'package:tasuki_app/features/home/presentation/timeline_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
